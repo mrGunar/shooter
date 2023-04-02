@@ -8,6 +8,11 @@ from objects.player import Player
 from objects.zombie import create_zombie
 from objects.bullet import Bullet
 
+def draw_text(text, color1, color2, x, y, screen, font):
+    t = font.render(text, True, color1, color2)
+    t_text = t.get_rect()
+    t_text.center = (x, y)
+    screen.blit(t, t_text)
 
 pg.mixer.pre_init(frequency = 44100, size = 16, channels = 1, buffer = 512)
 pg.init()
@@ -23,115 +28,117 @@ def create_bullet(player_rect, event):
 
 
 
+
+
+
+
+class Game:
     
+    def __init__(self):
+        self.font = pg.font.Font('freesansbold.ttf', 32)
+
+        self.screen = pg.display.set_mode((1000,600))
+        self.clock = pg.time.Clock()
 
 
+        self.bg_surface = pg.image.load('images/field.jpg').convert()
+        self.bg_surface = pg.transform.smoothscale(self.bg_surface, (1000, 600))
 
-font = pg.font.Font('freesansbold.ttf', 32)
+        self.menu = False
+        self.time_bullet_creation = 20
+        self.SCORES = 0
 
-screen = pg.display.set_mode((1000,600))
-clock = pg.time.Clock()
+        self.player = Player()
 
+        self.zombies = pg.sprite.Group()
 
-bg_surface = pg.image.load('images/field.jpg').convert()
-bg_surface = pg.transform.smoothscale(bg_surface, (1000, 600))
+        self.bullets = pg.sprite.Group()
 
-menu = False
-time_bullet_creation = 20
-SCORES = 0
+        self.players = pg.sprite.Group()
+        self.players.add(self.player)
 
-player = Player()
+        self.HEALTH = sum([x.hp for x in self.players])
 
-zombies = pg.sprite.Group()
-
-bullets = pg.sprite.Group()
-
-players = pg.sprite.Group()
-players.add(player)
-
-HEALTH = sum([x.hp for x in players])
-
-ROUND = 1
-
-while True:
+        self.ROUND = 1
     
-    if menu:
-        for event in pg.event.get():
-            if pg.key.get_pressed()[K_r]:
-                menu = False
-            if event.type == pg.QUIT:
-                    pg.quit()
-                    sys.exit()
-    else:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                pg.quit()
-                sys.exit()
-            elif pg.mouse.get_pressed()[0] == True:
-                if time_bullet_creation < 0:
-                    bullet = create_bullet(player, event)
-                    bullets.add(bullet)
-                    time_bullet_creation = 20
-            if pg.key.get_pressed()[K_r]:
-                menu = True
+    def run(self):
+        while True:
+            
+            if self.menu:
+                for event in pg.event.get():
+                    if pg.key.get_pressed()[K_r]:
+                        self.menu = False
+                    if event.type == pg.QUIT:
+                            pg.quit()
+                            sys.exit()
+                draw_text(f'PAUSE',  (255,255,255), (0,0,0), 800, 200, self.screen, self.font)
 
-        time_bullet_creation -= 1
+            else:
+                for event in pg.event.get():
+                    if event.type == pg.QUIT:
+                        pg.quit()
+                        sys.exit()
+                    elif pg.mouse.get_pressed()[0] == True:
+                        if self.time_bullet_creation < 0:
+                            bullet = create_bullet(self.player, event)
+                            self.bullets.add(bullet)
+                            self.time_bullet_creation = 20
+                    if pg.key.get_pressed()[K_r]:
+                        self.menu = True
 
-        # Update screen
-        screen.blit(bg_surface,(0,0))
+                self.time_bullet_creation -= 1
 
-        players.update()
-        players.draw(screen)
-        for p in players:
-            p.draw_hp_bar(screen)
-        
-        bullets.update()
-        bullets.draw(screen)
-        
-        zombies.update()
-        zombies.draw(screen)
-        for z in zombies:
-            z.draw_hp_bar(screen)
+                # Update screen
+                self.screen.blit(self.bg_surface,(0,0))
 
-        # Display SCORES
-        scores = font.render(f'SCORES {SCORES}', True, (255,255,255), (0,0,0))
-        scores_text = scores.get_rect()
-        scores_text.center = (100, 200)
-        screen.blit(scores, scores_text)
+                self.players.update()
+                self.players.draw(self.screen)
+                for p in self.players:
+                    p.draw_hp_bar(self.screen)
+                
+                self.bullets.update()
+                self.bullets.draw(self.screen)
+                
+                self.zombies.update()
+                self.zombies.draw(self.screen)
+                for z in self.zombies:
+                    z.draw_hp_bar(self.screen)
 
-        # Display PLAYER HEALTH
-        health = font.render(f'HEALTH {HEALTH}', True, (255,255,255), (0,0,0))
-        health_text = scores.get_rect()
-        health_text.center = (100, 300)
-        screen.blit(health, health_text)
-
-        # Display ROUND
-        round_ = font.render(f'ROUND {ROUND}', True, (255,255,255), (0,0,0))
-        round_text = scores.get_rect()
-        round_text.center = (100, 400)
-        screen.blit(round_, round_text)
-        
-        
-        if random.random() < 0.01:
-            to_wich_player = random.choice([x for x in players])
-            zombie = create_zombie(to_wich_player)
-            zombies.add(zombie)
+                # Display SCORES
+                draw_text(f'SCORES {self.SCORES}', (255,255,255), (0,0,0), 100, 200, self.screen, self.font)
 
 
-        # Check collision zombie with bullets        
-        for bullet in bullets:
-            hits = pg.sprite.spritecollide(bullet, zombies, False)
-            if hits:
-                bullet.kill()
-                [z.take_dmg(5) for z in hits]
-                SCORES += 1
-                    
-        # Check collision zombies with player
-        for zombie in zombies:
-            hits = pg.sprite.spritecollide(zombie, players, False)
-            if hits:
-                HEALTH -= zombie.dmg
-                zombie.kill()
+                # Display PLAYER HEALTH
+                draw_text(f'HEALTH {self.HEALTH}', (255,255,255), (0,0,0), 100, 300, self.screen, self.font)
 
-        pg.display.update()
-        clock.tick(30)
+                # Display ROUND
+                draw_text(f'ROUND {self.ROUND}', (255,255,255), (0,0,0), 100, 400, self.screen, self.font)
+                
+                
+                if random.random() < 0.01:
+                    to_wich_player = random.choice([x for x in self.players])
+                    zombie = create_zombie(to_wich_player)
+                    self.zombies.add(zombie)
+
+
+                # Check collision zombie with bullets        
+                for bullet in self.bullets:
+                    hits = pg.sprite.spritecollide(bullet, self.zombies, False)
+                    if hits:
+                        bullet.kill()
+                        [z.take_dmg(bullet.dmg) for z in hits]
+                        self.SCORES += 1
+                            
+                # Check collision zombies with player
+                for zombie in self.zombies:
+                    hits = pg.sprite.spritecollide(zombie, self.players, False)
+                    if hits:
+                        self.HEALTH -= zombie.dmg
+                        zombie.kill()
+
+            pg.display.update()
+            self.clock.tick(30)
+
+
+if __name__ == "__main__":
+    Game().run()
