@@ -89,6 +89,6 @@ def create_zombie(player):
     x = random.randint(400, 700)
     y = random.randint(0, 20)
     
-    if random.random() < 0.01:
+    if random.random() < 0.3:
         return ZombieBoss(x, y, player)
     return Zombie(x, y, player)
