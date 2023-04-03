@@ -1,19 +1,22 @@
 import pygame as pg
 import math
+from enum import Enum, auto
 
 
-class Bullet(pg.sprite.Sprite):
-    def __init__(self, x, y, angle):
-        super().__init__()
-        self.image = pg.image.load('images/bullet.png').convert()
-        self.image = pg.transform.scale(self.image, (2, 2))
-        self.rect = self.image.get_rect(center = (x, y))
-        self.angle = angle
-        self.dmg = 5
+class BulletClassification(Enum):
+    bullet = auto()
+    big_bullet = auto()
+    kernel =auto()
 
+
+class BaseBullet:
+    """Base represantation of the bullet."""
     def update(self):
-        self.rect.x += 30 * math.cos(self.angle)
-        self.rect.y += 30 * math.sin(self.angle)
+        self.rect.x += self.speed * math.cos(self.angle)
+        self.rect.y += self.speed * math.sin(self.angle)
+        
+        if self.y <= 0:
+            self.kill()
     
     @property
     def x(self):
@@ -23,7 +26,45 @@ class Bullet(pg.sprite.Sprite):
     def y(self):
         return self.rect.centery
 
-def create_bullet(start_point, mouse_click_event):
+
+class Bullet(BaseBullet, pg.sprite.Sprite):
+    def __init__(self, x, y, angle, damage=5, speed=10):
+        super().__init__()
+        pg.sprite.Sprite.__init__(self)
+
+        self.image = pg.image.load('images/bullet.png').convert()
+        self.image = pg.transform.scale(self.image, (2, 2))
+        self.rect = self.image.get_rect(center = (x, y))
+        self.angle = angle
+        self.dmg = damage
+        self.speed = speed + 25
+
+class BigBullet(BaseBullet, pg.sprite.Sprite):
+    def __init__(self, x, y, angle, damage=5, speed=10):
+        super().__init__()
+        pg.sprite.Sprite.__init__(self)
+
+        self.image = pg.image.load('images/bullet.png').convert()
+        self.image = pg.transform.scale(self.image, (4, 4))
+        self.rect = self.image.get_rect(center = (x, y))
+        self.angle = angle
+        self.dmg = damage + 25
+        self.speed = speed + 10
+
+class Kernel(BaseBullet, pg.sprite.Sprite):
+    def __init__(self, x, y, angle, damage=5, speed=10):
+        super().__init__()
+        pg.sprite.Sprite.__init__(self)
+
+        self.image = pg.image.load('images/bullet.png').convert()
+        self.image = pg.transform.scale(self.image, (10, 10))
+        self.rect = self.image.get_rect(center = (x, y))
+        self.angle = angle
+        self.dmg = damage + 55
+        self.speed = speed -5
+
+
+def create_bullet(start_point, mouse_click_event, damage, bullet_class) -> BaseBullet:
     """Method takes the start player coordinates and the mouse point 
     and calculates direction by two points on the game surface using the math module.
     """
@@ -32,5 +73,14 @@ def create_bullet(start_point, mouse_click_event):
     
     angle = math.atan2((mouse_y - start_y), (mouse_x - start_x))
     
-    bullet = Bullet(start_x, start_y, angle)
-    return bullet
+    bullet_classes = {
+        BulletClassification.bullet: Bullet,
+        BulletClassification.big_bullet: BigBullet,
+        BulletClassification.kernel: Kernel,
+    }
+
+    return bullet_classes[bullet_class](start_x, start_y, angle, damage)
+
+
+def get_all_bullet():
+    return [x for x in BulletClassification]

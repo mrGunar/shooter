@@ -1,4 +1,10 @@
 import pygame as pg
+from itertools import cycle
+
+from .bullet import get_all_bullet
+
+
+ALL_BULLETS = cycle(get_all_bullet())
 
 
 class Player(pg.sprite.Sprite):
@@ -8,6 +14,19 @@ class Player(pg.sprite.Sprite):
         self.image = pg.transform.scale(self.image, (25, 25))
         self.rect = self.image.get_rect(center = (550,500))
         self.hp = 100
+        self.money = 0
+
+        self.current_bullet = next(ALL_BULLETS)
+
+        self.available_current_bullet = False
+        self.equipment = {x: 10 for x in get_all_bullet()}
+
+    def check_bullet_available(self):
+        print(self.equipment[self.current_bullet])
+        return self.equipment[self.current_bullet] > 0
+    
+    def shoot(self):
+        self.equipment[self.current_bullet] -= 1
 
     def update(self):
         # Update the player's position or state here
@@ -23,6 +42,20 @@ class Player(pg.sprite.Sprite):
     def take_dmg(self, dmg):
         self.hp -= dmg
 
+    def get_hp(self, hp):
+        self.hp += hp
+
+    def take_money(self, m):
+        if self.money - m >= 0:
+            self.money -= m
+            return True
+        return False
+
+    def get_money(self, m):
+        self.money += m
+
+    def change_bullet(self):
+        self.current_bullet = next(ALL_BULLETS)
 
     @property
     def x(self):

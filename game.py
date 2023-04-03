@@ -2,12 +2,14 @@ import pygame as pg
 import sys
 from pygame.locals import *
 import random
+from itertools import cycle
 
 from objects.player import Player
-from objects.zombie import create_zombie
-from objects.bullet import Bullet, create_bullet
+from objects.zombie import create_zombie, get_zombie_cost
+from objects.bullet import Bullet, create_bullet, get_all_bullet
 from structure import Coordinate, PyGameConfig
 from servises import draw_text
+
 
 
 class Game:
@@ -29,6 +31,10 @@ class Game:
         self.ROUND = 1
         self.SCORES = 0
 
+
+    def check_bullet_available(self) -> bool:
+        return 
+
     def update_player_hp(self):
         return sum([x.hp for x in self.players])
 
@@ -37,7 +43,6 @@ class Game:
             hits = pg.sprite.spritecollide(zombie, self.players, False)
             if hits:
                 self.player.take_dmg(zombie.dmg)
-                print("ALO")
                 zombie.kill()
 
     def check_zombies_bullets_collision(self):
@@ -46,6 +51,11 @@ class Game:
             if hits:
                 bullet.kill()
                 [zombie.take_dmg(bullet.dmg) for zombie in hits]
+                for zombie in self.zombies:
+                    if zombie.hp <= 0:
+                        coast = get_zombie_cost(zombie.classification)
+                        zombie.kill()
+                        self.player.get_money(coast)
                 self.SCORES += 1
 
     def update_screen(self):
@@ -74,6 +84,9 @@ class Game:
         # Display ROUND
         draw_text(f'ROUND {self.ROUND}', 100, 400, self.config.screen, self.config.font)
 
+        # Display MONEY
+        draw_text(f'MONEY {self.player.money}', 100, 500, self.config.screen, self.config.font)
+
 
     def create_game_monster(self):
         if random.random() < 0.01:
@@ -97,29 +110,30 @@ class Game:
                         pg.quit()
                         sys.exit()
                     elif pg.mouse.get_pressed()[0] == True:
-                        if self.time_bullet_creation < 0:
-                            bullet = create_bullet(self.player, event)
+                        if self.time_bullet_creation < 0 and self.player.check_bullet_available():
+                            bullet = create_bullet(self.player, event, 30, self.player.current_bullet)
+                            self.player.shoot()
                             self.bullets.add(bullet)
                             self.time_bullet_creation = 20
                     if pg.key.get_pressed()[K_r]:
                         self.menu = True
+                    if pg.key.get_pressed()[K_z]:
+                        self.player.change_bullet()
 
-                    self.time_bullet_creation -= 1
+                self.time_bullet_creation -= 1
 
-                    self.update_screen()
+                self.update_screen()
 
-                    self.display_game_text()
+                self.display_game_text()
 
-                    self.create_game_monster()
+                self.create_game_monster()
 
-                    self.check_zombies_bullets_collision()
+                self.check_zombies_bullets_collision()
 
-                    self.check_zombie_player_collision()
-                    
-                    self.HEALTH = self.update_player_hp()
+                self.check_zombie_player_collision()
+                
+                self.HEALTH = self.update_player_hp()
+
                 
             pg.display.update()
             self.config.clock.tick(30)
-
-
-           
