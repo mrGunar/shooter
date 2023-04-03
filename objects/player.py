@@ -65,3 +65,7 @@ class Player(pg.sprite.Sprite):
     def y(self):
         return self.rect.centery
 
+    def text_info(self):
+        return  [f"Money: {self.money}", f"Health: {self.hp}", f"Bullet: {self.current_bullet.value}",
+                 f"Left: {self.equipment[self.current_bullet]}"
+                 ]
