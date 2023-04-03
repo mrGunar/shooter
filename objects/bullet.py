@@ -12,19 +12,11 @@ class BulletClassification(Enum):
 class BaseBullet:
     """Base represantation of the bullet."""
     def update(self):
-        self.rect.x += self.speed * math.cos(self.angle)
-        self.rect.y += self.speed * math.sin(self.angle)
+        self.rect.x += int(self.speed * math.cos(self.angle))
+        self.rect.y += int(self.speed * math.sin(self.angle))
         
-        if self.y <= 0:
+        if self.rect.y <= 0:
             self.kill()
-    
-    @property
-    def x(self):
-        return self.rect.centerx
-
-    @property
-    def y(self):
-        return self.rect.centery
 
 
 class Bullet(BaseBullet, pg.sprite.Sprite):

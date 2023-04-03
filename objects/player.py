@@ -22,6 +22,7 @@ class Player(pg.sprite.Sprite):
         self.equipment = {x: 10 for x in get_all_bullet()}
 
     def check_bullet_available(self):
+        print(self.equipment[self.current_bullet])
         return self.equipment[self.current_bullet] > 0
     
     def shoot(self):
@@ -75,4 +76,4 @@ class Player(pg.sprite.Sprite):
         self.equipment[BulletClassification.big_bullet] += 10
 
     def get_kernel(self):
-        self.equipment[BulletClassification.kernel] += 5
+        self.equipment[BulletClassification.kernel] += 20

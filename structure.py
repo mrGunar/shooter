@@ -6,12 +6,6 @@ pg.init()
 
 
 @dataclass
-class Coordinate:
-    x : int
-    y: int
-
-
-@dataclass
 class PyGameConfig:
         font = pg.font.Font('freesansbold.ttf', 32)
         screen = pg.display.set_mode((1000,600))
