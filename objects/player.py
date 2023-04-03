@@ -1,7 +1,7 @@
 import pygame as pg
 from itertools import cycle
 
-from .bullet import get_all_bullet
+from .bullet import get_all_bullet, BulletClassification
 
 
 ALL_BULLETS = cycle(get_all_bullet())
@@ -22,7 +22,6 @@ class Player(pg.sprite.Sprite):
         self.equipment = {x: 10 for x in get_all_bullet()}
 
     def check_bullet_available(self):
-        print(self.equipment[self.current_bullet])
         return self.equipment[self.current_bullet] > 0
     
     def shoot(self):
@@ -67,5 +66,13 @@ class Player(pg.sprite.Sprite):
 
     def text_info(self):
         return  [f"Money: {self.money}", f"Health: {self.hp}", f"Bullet: {self.current_bullet.value}",
-                 f"Left: {self.equipment[self.current_bullet]}"
-                 ]
+                 f"Left: {self.equipment[self.current_bullet]}"]
+
+    def get_base_bullet(self):
+        self.equipment[BulletClassification.bullet] += 20
+
+    def get_big_bullets(self):
+        self.equipment[BulletClassification.big_bullet] += 10
+
+    def get_kernel(self):
+        self.equipment[BulletClassification.kernel] += 5

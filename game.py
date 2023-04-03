@@ -70,6 +70,10 @@ class Game:
 
         # Display ROUND
         draw_text(f'ROUND {self.ROUND}', 100, 100, self.config.screen, self.config.font)
+        draw_text(f'Switch weapon: Z', 100, 150, self.config.screen, self.config.font)
+        draw_text(f'Buy bullets: 1', 100, 200, self.config.screen, self.config.font)
+        draw_text(f'Buy big bullets: 2', 100, 250, self.config.screen, self.config.font)
+        draw_text(f'Buy kernels: 3', 100, 300, self.config.screen, self.config.font)
         
         for line, hight in zip(self.player.text_info(), range(100, 1000, 50)):
             draw_text(line, 900, 50 + hight, self.config.screen, self.config.font)
@@ -105,8 +109,22 @@ class Game:
                             self.time_bullet_creation = 20
                     if pg.key.get_pressed()[K_r]:
                         self.menu = True
+
                     if pg.key.get_pressed()[K_z]:
                         self.player.change_bullet()
+
+                    if pg.key.get_pressed()[K_1]:
+                        if self.player.money - 25 >= 0:
+                            self.player.get_base_bullet()
+                            self.player.take_money(25)
+                    if pg.key.get_pressed()[K_2]:
+                        if self.player.money - 50 >= 0:
+                            self.player.get_big_bullets()
+                            self.player.take_money(50)
+                    if pg.key.get_pressed()[K_3]:
+                        if self.player.money - 200 >= 0:
+                            self.player.get_kernels()
+                            self.player.take_money(200)
 
                 self.time_bullet_creation -= 1
 
