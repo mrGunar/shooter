@@ -10,8 +10,10 @@ class ZombieClassification(Enum):
 
 
 class BaseZombie:
-    def __init__(self, final_point):
+    def __init__(self, final_point, zombie_speed=0):
         self.final_point = final_point
+        self.count = 0
+        self.zombie_speed = zombie_speed
 
     def draw_hp_bar(self, screen):
         # Draw background rectangle
@@ -22,11 +24,14 @@ class BaseZombie:
 
     def update(self):
         # Update the player's position or state here
-        dx, dy = self.x -  self.final_point.x, self.y -  self.final_point.y
-        dist = max(math.hypot(dx, dy), 0.01)
-        dx, dy = dx/dist, dy/dist
-        self.rect.x -= dx * 2
-        self.rect.y -= dy * 2
+        self.count += 1
+        if self.count >= self.zombie_speed:
+            dx, dy = self.x -  self.final_point.x, self.y -  self.final_point.y
+            dist = max(math.hypot(dx, dy), 0.01)
+            dx, dy = dx/dist, dy/dist
+            self.rect.x -= dx * 2
+            self.rect.y -= dy * 2
+            self.count = 0
         
     def take_dmg(self, dmg):
         self.hp -= dmg
@@ -41,24 +46,24 @@ class BaseZombie:
 
 class Zombie(BaseZombie, pg.sprite.Sprite):
     def __init__(self, x, y, final_point):
-        super().__init__(final_point)
+        super().__init__(final_point, zombie_speed=2)
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load('images/zomb.jpg').convert()
         self.image = pg.transform.scale(self.image, (15, 15))
         self.rect = self.image.get_rect(center = (x, y))
-        self.hp = 5
+        self.hp = 10
         self.dmg = 1
         self.classification = ZombieClassification.zombie
 
 
 class ZombieBoss(BaseZombie, pg.sprite.Sprite):
     def __init__(self, x, y, final_point):
-        super().__init__(final_point)
+        super().__init__(final_point, zombie_speed=7)
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load('images/boss.jpeg').convert()
         self.image = pg.transform.scale(self.image, (20, 20))
         self.rect = self.image.get_rect(center = (x, y))
-        self.hp = 50
+        self.hp = 75
         self.dmg = 10
         self.classification = ZombieClassification.zombie_boss
 

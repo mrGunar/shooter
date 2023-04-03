@@ -48,7 +48,7 @@ class BigBullet(BaseBullet, pg.sprite.Sprite):
         self.image = pg.transform.scale(self.image, (4, 4))
         self.rect = self.image.get_rect(center = (x, y))
         self.angle = angle
-        self.dmg = damage + 25
+        self.dmg = damage + 15
         self.speed = speed + 10
 
 class Kernel(BaseBullet, pg.sprite.Sprite):
@@ -61,7 +61,7 @@ class Kernel(BaseBullet, pg.sprite.Sprite):
         self.rect = self.image.get_rect(center = (x, y))
         self.angle = angle
         self.dmg = damage + 55
-        self.speed = speed -5
+        self.speed = speed - 5
 
 
 def create_bullet(start_point, mouse_click_event, damage, bullet_class) -> BaseBullet:
