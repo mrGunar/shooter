@@ -24,7 +24,7 @@ class Bullet(BaseBullet, pg.sprite.Sprite):
         super().__init__()
         pg.sprite.Sprite.__init__(self)
 
-        self.image = pg.image.load('images/bullet.png').convert()
+        self.image = pg.image.load('images/bullet.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (2, 2))
         self.rect = self.image.get_rect(center = (x, y))
         self.angle = angle
@@ -36,7 +36,7 @@ class BigBullet(BaseBullet, pg.sprite.Sprite):
         super().__init__()
         pg.sprite.Sprite.__init__(self)
 
-        self.image = pg.image.load('images/bullet.png').convert()
+        self.image = pg.image.load('images/bullet.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (4, 4))
         self.rect = self.image.get_rect(center = (x, y))
         self.angle = angle
@@ -48,7 +48,7 @@ class Kernel(BaseBullet, pg.sprite.Sprite):
         super().__init__()
         pg.sprite.Sprite.__init__(self)
 
-        self.image = pg.image.load('images/bullet.png').convert()
+        self.image = pg.image.load('images/bullet.png').convert_alpha()
         self.image = pg.transform.scale(self.image, (10, 10))
         self.rect = self.image.get_rect(center = (x, y))
         self.angle = angle
@@ -57,7 +57,7 @@ class Kernel(BaseBullet, pg.sprite.Sprite):
 
 
 def create_bullet(start_point, mouse_click_event, damage, bullet_class) -> BaseBullet:
-    """Method takes the start player coordinates and the mouse point 
+    """Method takes the start Tower coordinates and the mouse point 
     and calculates direction by two points on the game surface using the math module.
     """
     start_x, start_y = start_point.x, start_point.y
