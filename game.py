@@ -155,4 +155,4 @@ class Game:
                 self.check_zombie_Tower_collision()
                 
             pg.display.update()
-            self.config.clock.tick(30)
+            self.config.clock.tick(60)

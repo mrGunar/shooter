@@ -10,7 +10,7 @@ class ZombieClassification(Enum):
 
 
 class BaseZombie:
-    def __init__(self, final_point, zombie_speed=2):
+    def __init__(self, final_point, zombie_speed=20):
         self.final_point = final_point
         self.count = 0
         self.zombie_speed = zombie_speed
@@ -28,7 +28,6 @@ class BaseZombie:
         if self.count >= self.zombie_speed:
             dx, dy = self.x -  self.final_point.x, self.y -  self.final_point.y
             dist = max(math.hypot(dx, dy), 0.01)
-            dx_e = random.randint(-2, 2)
             dx, dy = dx/dist, dy/dist
             self.rect.x -= dx * 10
             self.rect.y -= dy * 10
@@ -47,7 +46,7 @@ class BaseZombie:
 
 class Zombie(BaseZombie, pg.sprite.Sprite):
     def __init__(self, x, y, final_point):
-        super().__init__(final_point, zombie_speed=10)
+        super().__init__(final_point, zombie_speed=30)
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load('images/zomb.jpg').convert_alpha()
         self.image = pg.transform.scale(self.image, (15, 15))
@@ -59,7 +58,7 @@ class Zombie(BaseZombie, pg.sprite.Sprite):
 
 class ZombieBoss(BaseZombie, pg.sprite.Sprite):
     def __init__(self, x, y, final_point):
-        super().__init__(final_point, zombie_speed=30)
+        super().__init__(final_point, zombie_speed=50)
         pg.sprite.Sprite.__init__(self)
         self.image = pg.image.load('images/boss.jpeg').convert_alpha()
         self.image = pg.transform.scale(self.image, (20, 20))
